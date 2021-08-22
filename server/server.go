@@ -58,9 +58,15 @@ func inRange(point *pb.Point, rect *pb.Rectangle) bool {
 	left := math.Min(float64(rect.Lo.Longitude), float64(rect.Hi.Longitude))
 	right := math.Max(float64(rect.Lo.Longitude), float64(rect.Hi.Longitude))
 	top := math.Max(float64(rect.Lo.Latitude), float64(rect.Hi.Latitude))
-	bottom := math.Max(float64(rect.Lo.Latitude), float64(rect.Hi.Latitude))
-	return float64(point.Longitude) >= left && float64(point.Longitude) <= right && float64(point.Latitude) >= bottom && float64(point.Latitude) <= top
+	bottom := math.Min(float64(rect.Lo.Latitude), float64(rect.Hi.Latitude))
 
+	if float64(point.Longitude) >= left &&
+		float64(point.Longitude) <= right &&
+		float64(point.Latitude) >= bottom &&
+		float64(point.Latitude) <= top {
+		return true
+	}
+	return false
 }
 
 func (s *routeGuideServer) RecordRoute(stream pb.RouteGuide_RecordRouteServer) error {
