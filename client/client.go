@@ -55,7 +55,49 @@ func main() {
 	//})
 
 	// RecordRoute
-	runRecordRoute(client)
+	//runRecordRoute(client)
+
+	// runRouteChat
+	runRouteChat(client)
+}
+
+func runRouteChat(client pb.RouteGuideClient) {
+	notes := []*pb.RouteNote{
+		{Location: &pb.Point{Latitude: 0, Longitude: 1}, Message: "First message"},
+		{Location: &pb.Point{Latitude: 0, Longitude: 2}, Message: "Second message"},
+		{Location: &pb.Point{Latitude: 0, Longitude: 3}, Message: "Third message"},
+		{Location: &pb.Point{Latitude: 0, Longitude: 1}, Message: "Fourth message"},
+		{Location: &pb.Point{Latitude: 0, Longitude: 2}, Message: "Fifth message"},
+		{Location: &pb.Point{Latitude: 0, Longitude: 3}, Message: "Sixth message"},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	defer cancel()
+	stream, err := client.RouteChat(ctx)
+	if err != nil {
+		log.Fatalf("%v.RouteChat(_) = _, %v", client, err)
+	}
+	waitC := make(chan struct{})
+	go func() {
+		for {
+			in, err := stream.Recv()
+			if err == io.EOF {
+				// read done
+				close(waitC)
+				return
+			}
+			if err != nil {
+				log.Fatalf("failed to receive a note: %v", err)
+			}
+			log.Printf("Got message %s at point(%d, %d)",in.Message, in.Location.Latitude, in.Location.Longitude)
+		}
+	}()
+	for _, note := range notes {
+		if err := stream.Send(note); err != nil {
+			log.Fatalf("failed to send a note: %v", err)
+		}
+	}
+	stream.CloseSend()
+	<-waitC
 }
 
 // printFeatures lists all the features within the given bounding Rectangle.

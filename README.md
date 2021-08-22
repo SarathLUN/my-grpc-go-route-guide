@@ -165,9 +165,42 @@ gor client/client.go
 2021/08/22 22:04:57 Feature: name="3 Hasta Way, Newton, NJ 07860, USA", point=(410248224, -747127767)
 
 ```
-# RecordRoute
+# runRecordRoute
 ```shell
 2021/08/22 22:09:06 traversing 53 points
 2021/08/22 22:09:06 Route Summary: point_count:53 distance:456248417
+
+```
+# runRouteChat
+- first run got this error:
+```shell
+2021/08/23 00:35:30 failed to receive a note: rpc error: code = DeadlineExceeded desc = context deadline exceeded
+exit status 1
+```
+- found the error, because of `server/server.go` func `RouteChat` was not completed :(
+- missed line#141-149 from example code
+```go
+rn := make([]*pb.RouteNote, len(s.routeNotes[key]))
+copy(rn, s.routeNotes[key])
+s.mu.Unlock()
+
+for _, note := range rn {
+    if err := stream.Send(note); err != nil {
+        return err
+    }
+}
+```
+- after corrected and re-run server again
+- client worked:
+```shell
+2021/08/23 00:46:57 Got message First message at point(0, 1)
+2021/08/23 00:46:57 Got message Second message at point(0, 2)
+2021/08/23 00:46:57 Got message Third message at point(0, 3)
+2021/08/23 00:46:57 Got message First message at point(0, 1)
+2021/08/23 00:46:57 Got message Fourth message at point(0, 1)
+2021/08/23 00:46:57 Got message Second message at point(0, 2)
+2021/08/23 00:46:57 Got message Fifth message at point(0, 2)
+2021/08/23 00:46:57 Got message Third message at point(0, 3)
+2021/08/23 00:46:57 Got message Sixth message at point(0, 3)
 
 ```
