@@ -178,7 +178,7 @@ gor client/client.go
 exit status 1
 ```
 - found the error, because of `server/server.go` func `RouteChat` was not completed :(
-- missed line#141-149 from example code
+- missed line#141-149 from [example code](https://github.com/grpc/grpc-go/blob/master/examples/route_guide/server/server.go)
 ```go
 rn := make([]*pb.RouteNote, len(s.routeNotes[key]))
 copy(rn, s.routeNotes[key])
