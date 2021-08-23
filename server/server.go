@@ -8,7 +8,7 @@ import (
 	pb "github.com/SarathLUN/my-grpc-go-route-guide/route-proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/examples/data"
+	"github.com/SarathLUN/my-grpc-go-route-guide/data"
 	"google.golang.org/protobuf/proto"
 	"io"
 	"io/ioutil"
